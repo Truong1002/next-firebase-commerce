@@ -7,3 +7,5 @@ export interface IAdminDb{
     created_at: string
     updated_at: string
 }
+
+export interface ICreateAdminInput extends Pick<IAdminDb, 'email' | 'password'>{}

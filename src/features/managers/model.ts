@@ -1,18 +1,29 @@
 import { addDoc, collection, getDoc, getDocs, query, Timestamp, where } from "firebase/firestore";
-import { ICreateAdminInput } from "./type";
+import { IAdminDb, ICreateAdminInput } from "./type";
 import { COLLECTIONS } from "@/constants/common";
 import { db } from "@/utils/firebase";
 import { hashPassword } from "@/utils/common/password";
 
+const adminRef = collection(db, COLLECTIONS.ADMIN)
+
+export const findAdminByEmail = async (email:string): Promise<IAdminDb> => {
+    const existedAdmin = await getDocs(
+        query(adminRef, where("email", "==", email ))
+    );
+
+    const admin = existedAdmin.docs[0].data() as IAdminDb;
+
+    return {
+        ...admin,
+        id: existedAdmin.docs[0].id
+    }
+}
+
 export const createAdmin = async (data: ICreateAdminInput) => {
     //TODO: Save to firebase
-    const adminRef = collection(db, COLLECTIONS.ADMIN)
+    const existedAdmin = await findAdminByEmail(data.email);
 
-    const existedAdmin = await getDocs(
-        query(adminRef, where("email", "==", data.email ))
-    ) 
-
-    if(existedAdmin.docs.length){
+    if(existedAdmin){
         throw Error("Email is existed");
     }
 
@@ -28,3 +39,4 @@ export const createAdmin = async (data: ICreateAdminInput) => {
     const newAdmin = await getDoc(newAdminRef);
     return {id: newAdmin.id, ...newAdmin.data() }
 }
+

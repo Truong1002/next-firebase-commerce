@@ -45,7 +45,6 @@ export default function AdminLoginForm() {
   } = form;
 
   const onLogin = async (data: ICreateAdminInput) => {
-    console.log("🚀 ~ onLogin ~ data:", data);
     try {
       const res = await signIn("credentials", {
         email: data.email,
@@ -54,7 +53,6 @@ export default function AdminLoginForm() {
       });
 
       if (res?.error) {
-        console.log("🚀 ~ onLogin ~ res?.error:", res?.error);
         toast.error(
           `Cannot login, ${res?.error || "check you email or password"}`
         );

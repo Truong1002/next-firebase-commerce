@@ -11,6 +11,9 @@ export const findAdminByEmail = async (email:string): Promise<IAdminDb> => {
         query(adminRef, where("email", "==", email ))
     );
 
+    if(!existedAdmin.docs[0]) {
+        throw Error("Email is not exist");
+    }
     const admin = existedAdmin.docs[0].data() as IAdminDb;
 
     return {

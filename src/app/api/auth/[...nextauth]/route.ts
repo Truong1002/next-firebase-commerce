@@ -28,12 +28,14 @@ export const authOptions: NextAuthOptions = {
     providers : [
         CredentialsProvider({
             credentials: {},
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             async authorize(credentials, req){
                 const {email, password} = credentials as ICreateAdminInput;
                 const data = loginSchema.safeParse({email, password})
 
                 if(!data.success){
                     const messages = JSON.parse(data.error.message)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     throw Error(messages.map((i: any) => i.messages).join(','))
                 }
                 return adminLogin(email, password);

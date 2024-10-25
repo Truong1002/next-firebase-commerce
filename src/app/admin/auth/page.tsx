@@ -41,7 +41,7 @@ export default function AdminLoginForm() {
   const {
     control,
     handleSubmit,
-    formState: { isValid, errors },
+    formState: { isValid },
   } = form;
 
   const onLogin = async (data: ICreateAdminInput) => {
@@ -61,7 +61,8 @@ export default function AdminLoginForm() {
       } else {
         router.push("/admin/categories");
       }
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch ( error ) {
       toast.error("Cannot login, check you email or password");
     }
   };
@@ -75,7 +76,7 @@ export default function AdminLoginForm() {
               <CardDescription>
                 Enter your email below to login to your account.
                 <br />
-                <b>admin5@gmail.com / 123</b>
+                <b>truongphamxuan724@gmail.com / 123456</b>
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">

@@ -4,3 +4,4 @@ export const COLLECTIONS = {
     PRODUCT: "products",
     CART: "carts",
   };
+

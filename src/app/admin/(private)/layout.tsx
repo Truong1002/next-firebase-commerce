@@ -1,29 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Toaster } from "@/components/ui/sonner";
-import Image from "next/image";
 import Link from "next/link";
 import {
   Boxes,
-  File,
-  Home,
-  icons,
-  LineChart,
-  ListFilter,
-  MoreHorizontal,
   Package,
   Package2,
   PanelLeft,
-  PlusCircle,
   Search,
   Settings,
-  ShoppingCart,
+  User,
   Users,
-  Users2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -38,6 +28,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import Logout from "@/components/common/logout";
   const ADMIN_PAGES = [
   {
     path: "/admin/categories",
@@ -55,11 +49,16 @@ import {
     icon: <Users className="h-5 w-5" />,
   },
 ];
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    redirect("/admin/auth");
+  }
   
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -146,22 +145,18 @@ export default function RootLayout({
                 size="icon"
                 className="overflow-hidden rounded-full"
               >
-                <Image
-                  src="/placeholder-user.jpg"
-                  width={36}
-                  height={36}
-                  alt="Avatar"
-                  className="overflow-hidden rounded-full"
-                />
+                <User className="w-6 h-6"/>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{session.user.email}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem>
+                <Logout/>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
@@ -171,5 +166,5 @@ export default function RootLayout({
         </main>
       </div>
     </div>
-  );
+  )
 }

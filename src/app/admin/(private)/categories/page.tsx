@@ -6,9 +6,13 @@ import TableLoading from "./table-loading";
 import CategoryTable from "./table";
 import TablePagination from "./table-pagination";
 
-
-const Category = async () => {
-  const data = await getCategories();
+interface IProps {
+  searchParams: {
+    keyword: string;
+  }
+}
+const Category = async ({ searchParams}: IProps) => {
+  const data = await getCategories({keyword: searchParams.keyword});
   return (
     <div>
       <TableHeader />

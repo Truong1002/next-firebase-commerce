@@ -9,3 +9,7 @@ export interface ICreateCategoryInput {
 
 export interface ICategoryDb extends ICreateCategoryInput, IDocDb {}
 export interface ICategoryDoc extends ICreateCategoryInput, Omit<IDocDb, "id"> {}
+
+export interface IGetCategoryInput {
+    keyword: string;
+}

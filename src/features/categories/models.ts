@@ -1,7 +1,7 @@
 import { COLLECTIONS } from "@/constants/common";
 import { db } from "@/utils/firebase";
-import { addDoc, collection, getDoc, getDocs, query, Timestamp, where } from "firebase/firestore";
-import { ICategoryDb, ICategoryDoc, ICreateCategoryInput } from "./type";
+import { addDoc, collection, endAt, getDoc, getDocs, orderBy, query, startAt, Timestamp, where } from "firebase/firestore";
+import { ICategoryDb, ICategoryDoc, ICreateCategoryInput, IGetCategoryInput } from "./type";
 import { AddCategorySchema } from "./rules";
 import { formatZodMessage } from "@/utils/common/zod-message";
 
@@ -44,8 +44,18 @@ export const addCategory = async(data: ICreateCategoryInput): Promise<ICategoryD
     }
 }
 
-export const getCategories = async ():Promise<ICategoryDb[]> => {
-    const categoriesDocsRef = await getDocs(query(categoriesRef))
+export const getCategories = async (
+    data?: IGetCategoryInput
+):Promise<ICategoryDb[]> => {
+    const keyword = data?.keyword || '';
+    const categoriesDocsRef = await getDocs(
+        query(
+            categoriesRef,
+            orderBy("name"),
+            startAt(keyword),
+            endAt(keyword + "\uf8ff")
+        )
+    )
 
     const categories = categoriesDocsRef.docs.map((d) => ({
         ...(d.data() as ICategoryDoc),

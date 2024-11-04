@@ -1,3 +1,4 @@
+import SearchBar from "@/components/common/search";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,6 +15,7 @@ const TableHeader = () => {
   return (
     <div className="mb-6">
       <div className="flex items-center">
+        <SearchBar/>
         <Select value="ID">
           <SelectTrigger className="w-[100px] py-1">
             <SelectValue placeholder="Theme" />

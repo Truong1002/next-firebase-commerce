@@ -44,11 +44,11 @@ export const addCategory = async(data: ICreateCategoryInput): Promise<ICategoryD
     }
 }
 
-export const getCategories = async () => {
+export const getCategories = async ():Promise<ICategoryDb[]> => {
     const categoriesDocsRef = await getDocs(query(categoriesRef))
 
     const categories = categoriesDocsRef.docs.map((d) => ({
-        ...d.data(),
+        ...d.data() as ICategoryDoc,
         id: d.id
     }))
 

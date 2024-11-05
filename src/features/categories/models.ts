@@ -67,7 +67,7 @@ queries.push(...queriesKeyword);
         query(categoriesRef, ...queries, limit(size))
     );
 
-    const categories = categoriesDocsRef.docs.slice(0,5).map((d) => ({
+    const categories = categoriesDocsRef.docs.map((d) => ({
         ...(d.data() as ICategoryDoc),
         id: d.id
     }))

@@ -12,4 +12,6 @@ export interface ICategoryDoc extends ICreateCategoryInput, Omit<IDocDb, "id"> {
 
 export interface IGetCategoryInput {
     keyword: string;
+    page: number;
+    size?: number;
 }

@@ -1,9 +1,10 @@
 import { COLLECTIONS } from "@/constants/common";
 import { db } from "@/utils/firebase";
-import { addDoc, collection, endAt, getDoc, getDocs, orderBy, query, startAt, Timestamp, where } from "firebase/firestore";
+import { addDoc, collection, endAt, getCountFromServer, getDoc, getDocs, limit, orderBy, Query, query, startAfter, startAt, Timestamp, where } from "firebase/firestore";
 import { ICategoryDb, ICategoryDoc, ICreateCategoryInput, IGetCategoryInput } from "./type";
 import { AddCategorySchema } from "./rules";
 import { formatZodMessage } from "@/utils/common/zod-message";
+import { IPaginationRes } from "../type";
 
 const categoriesRef = collection(db, COLLECTIONS.CATEGORY)
 
@@ -45,22 +46,44 @@ export const addCategory = async(data: ICreateCategoryInput): Promise<ICategoryD
 }
 
 export const getCategories = async (
-    data?: IGetCategoryInput
-):Promise<ICategoryDb[]> => {
-    const keyword = data?.keyword || '';
-    const categoriesDocsRef = await getDocs(
-        query(
-            categoriesRef,
-            orderBy("name"),
-            startAt(keyword),
-            endAt(keyword + "\uf8ff")
-        )
-    )
+    data: IGetCategoryInput
+): Promise<IPaginationRes<ICategoryDb>> => {
+    const {keyword, page, size} = data;
+    const queries = [];
 
-    const categories = categoriesDocsRef.docs.map((d) => ({
+    const queriesKeyword = keyword
+    ? [orderBy("name"), startAt(keyword), endAt(keyword + "\uf8ff")]
+    : [orderBy("name")];
+queries.push(...queriesKeyword);
+
+    if (page > 1){
+        const lastDoc = await getLastVisibleDoc(
+            categoriesRef,
+            page,
+            Number(size || 5)
+        );
+        queries.push(startAfter(lastDoc));
+    }
+
+    const categoriesDocsRef = await getDocs(
+        query(categoriesRef, ...queries, limit(size || 5))
+    );
+
+    const categories = categoriesDocsRef.docs.slice(0,5).map((d) => ({
         ...(d.data() as ICategoryDoc),
         id: d.id
     }))
 
-    return categories;
+    const total = await getCountFromServer(query(categoriesRef, ...queriesKeyword))
+    return {meta: {total: total.data().count}, data: categories}
+}
+
+const getLastVisibleDoc = async (
+    queryRef : Query,
+    page : number,
+    size : number
+) => {
+    const docFormStart = await getDocs(query(queryRef, limit((page -1) * size)));
+    const lastDoc = docFormStart.docs[docFormStart.docs.length - 1];
+    return lastDoc;
 }

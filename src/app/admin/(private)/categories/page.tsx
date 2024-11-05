@@ -5,14 +5,16 @@ import { Suspense } from "react";
 import TableLoading from "./table-loading";
 import CategoryTable from "./table";
 import TablePagination from "./table-pagination";
+import { IGetCategoryInput } from "@/features/categories/type";
 
 interface IProps {
-  searchParams: {
-    keyword: string;
-  }
+  searchParams: IGetCategoryInput
 }
 const Category = async ({ searchParams}: IProps) => {
-  const data = await getCategories({keyword: searchParams.keyword});
+  const res = await getCategories({
+    keyword : searchParams.keyword,
+    page : searchParams.page,
+  });
   return (
     <div>
       <TableHeader />
@@ -23,14 +25,14 @@ const Category = async ({ searchParams}: IProps) => {
           </CardHeader>
           <CardContent>
             <Suspense fallback={<TableLoading/>}>
-              <CategoryTable data = {data}/>
+              <CategoryTable data = {res.data}/>
             </Suspense>
           </CardContent>
           <CardFooter className="flex flex-col items-end">
             <div className="text-xs text-muted-foreground mb-1">
-                Showing <strong>1-10</strong> of <strong>32</strong> categories
+               <strong>{res.meta.total}</strong> categories
             </div>
-            <TablePagination />
+            <TablePagination total = {res.meta.total}/>
           </CardFooter>
       </Card>
     </div>

@@ -1,6 +1,6 @@
 import { COLLECTIONS } from "@/constants/common";
 import { db } from "@/utils/firebase";
-import { addDoc, collection, endAt, getCountFromServer, getDoc, getDocs, limit, orderBy, Query, query, startAfter, startAt, Timestamp, where } from "firebase/firestore";
+import { addDoc, collection, endAt, getCountFromServer, getDoc, getDocs, limit, orderBy, Query, query, QueryConstraint, startAfter, startAt, Timestamp, where } from "firebase/firestore";
 import { ICategoryDb, ICategoryDoc, ICreateCategoryInput, IGetCategoryInput } from "./type";
 import { AddCategorySchema } from "./rules";
 import { formatZodMessage } from "@/utils/common/zod-message";
@@ -48,7 +48,7 @@ export const addCategory = async(data: ICreateCategoryInput): Promise<ICategoryD
 export const getCategories = async (
     data: IGetCategoryInput
 ): Promise<IPaginationRes<ICategoryDb>> => {
-    const {keyword, page, size} = data;
+    const {keyword, page, size = 5} = data;
     const queries = [];
 
     const queriesKeyword = keyword
@@ -57,16 +57,14 @@ export const getCategories = async (
 queries.push(...queriesKeyword);
 
     if (page > 1){
-        const lastDoc = await getLastVisibleDoc(
-            categoriesRef,
-            page,
-            Number(size || 5)
-        );
-        queries.push(startAfter(lastDoc));
+        const lastDoc = await getLastVisibleDoc(categoriesRef, queriesKeyword, page, size);
+        if (lastDoc) {
+            queries.push(startAfter(lastDoc));
+        }
     }
 
     const categoriesDocsRef = await getDocs(
-        query(categoriesRef, ...queries, limit(size || 5))
+        query(categoriesRef, ...queries, limit(size))
     );
 
     const categories = categoriesDocsRef.docs.slice(0,5).map((d) => ({
@@ -79,11 +77,14 @@ queries.push(...queriesKeyword);
 }
 
 const getLastVisibleDoc = async (
-    queryRef : Query,
-    page : number,
-    size : number
+    queryRef: Query,
+    queries: QueryConstraint[],
+    page: number,
+    size: number
 ) => {
-    const docFormStart = await getDocs(query(queryRef, limit((page -1) * size)));
+    const offset = (page - 1) * size;
+    const limitedQueries = [...queries, limit(offset)];
+    const docFormStart = await getDocs(query(queryRef, ...limitedQueries));
     const lastDoc = docFormStart.docs[docFormStart.docs.length - 1];
     return lastDoc;
-}
+};

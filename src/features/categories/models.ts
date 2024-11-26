@@ -13,108 +13,108 @@ import {
   startAt,
   Timestamp,
   where,
-  } from "firebase/firestore";
-  import {
+} from "firebase/firestore";
+import {
   ICategoryDb,
   ICategoryDoc,
   ICreateCategoryInput,
   IGetCategoryInput,
-  } from "./type";
-  import { db } from "@/utils/firebase";
-  import { COLLECTIONS } from "@/constants/common";
-  import { AddCategorySchema } from "./rules";
-  import { formatZodMessage } from "@/utils/common/zod-message";
-  import { IPaginationRes } from "../type";
-  
-  const categoriesRef = collection(db, COLLECTIONS.CATEGORY);
-  
-  export const getCategoryBySlug = async (slug: string) => {
+} from "./type";
+import { db } from "@/utils/firebase";
+import { COLLECTIONS } from "@/constants/common";
+import { AddCategorySchema } from "./rules";
+import { formatZodMessage } from "@/utils/common/zod-message";
+import { IPaginationRes } from "../type";
+
+const categoriesRef = collection(db, COLLECTIONS.CATEGORY);
+
+export const getCategoryBySlug = async (slug: string) => {
   const existedCategory = await getDocs(
-  query(categoriesRef, where("slug", "==", slug))
+    query(categoriesRef, where("slug", "==", slug))
   );
-  
+
   if (!existedCategory.docs[0]) {
-  return undefined;
+    return undefined;
   }
-  
+
   const category = existedCategory.docs[0].data() as ICategoryDoc;
-  
+
   return {
-  ...category,
-  id: existedCategory.docs[0].id,
+    ...category,
+    id: existedCategory.docs[0].id,
   };
-  };
-  
-  export const addCategory = async (
+};
+
+export const addCategory = async (
   data: ICreateCategoryInput
-  ): Promise<ICategoryDb> => {
+): Promise<ICategoryDb> => {
   const test = AddCategorySchema.safeParse(data);
   if (!test.success) {
-  const message = formatZodMessage(test.error);
-  throw Error(message);
+    const message = formatZodMessage(test.error);
+    throw Error(message);
   }
   const existedCategory = await getCategoryBySlug(data.slug);
   if (existedCategory) {
-  throw Error("Slug have been used!");
+    throw Error("Slug have been used!");
   }
   const newCateRef = await addDoc(categoriesRef, {
-  ...data,
-  created_at: Timestamp.now(),
-  updated_at: Timestamp.now(),
+    ...data,
+    created_at: Timestamp.now(),
+    updated_at: Timestamp.now(),
   });
-  
+
   const newCategory = await getDoc(newCateRef);
-  
+
   return { id: newCategory.id, ...(newCategory.data() as ICategoryDoc) };
-  };
-  
-  export const getCategories = async (
+};
+
+export const getCategories = async (
   data: IGetCategoryInput
-  ): Promise<IPaginationRes<ICategoryDb>> => {
-    const { keyword, page, size, orderField, orderType } = data;
+): Promise<IPaginationRes<ICategoryDb>> => {
+  const { keyword, page, size, orderField, orderType } = data;
   const queries = [];
-    queries.push(orderBy(orderField, orderType));
-    const queriesKeyword = [];
-    if (keyword) {
-      const keywordQueries = [
-        orderBy("name"),
-        startAt(keyword),
-        endAt(keyword + "\uf8ff"),
-      ];
-      queriesKeyword.push(...keywordQueries);
-      queries.push(...keywordQueries);
-    }
-  if (page > 1) {
-  const lastDoc = await getLastVisibleDoc(
-        query(categoriesRef, ...queries),
-  page,
-  Number(size || 5)
-  );
-  queries.push(startAfter(lastDoc));
+  queries.push(orderBy(orderField, orderType));
+  const queriesKeyword = [];
+  if (keyword) {
+    const keywordQueries = [
+      orderBy("name"),
+      startAt(keyword),
+      endAt(keyword + "\uf8ff"),
+    ];
+    queriesKeyword.push(...keywordQueries);
+    queries.push(...keywordQueries);
   }
-  
-  const categoriesDocsRef = await getDocs(
-  query(categoriesRef, ...queries, limit(size || 5))
-  );
-  
-  const categories = categoriesDocsRef.docs.slice(0, 5).map((d) => ({
-  ...(d.data() as ICategoryDoc),
-  id: d.id,
-  }));
-  
-    const total = await getCountFromServer(
-      query(categoriesRef, ...queriesKeyword)
+  if (page > 1) {
+    const lastDoc = await getLastVisibleDoc(
+      query(categoriesRef, ...queries),
+      page,
+      Number(size || 5)
     );
-  
+    queries.push(startAfter(lastDoc));
+  }
+
+  const categoriesDocsRef = await getDocs(
+    query(categoriesRef, ...queries, limit(size || 5))
+  );
+
+  const categories = categoriesDocsRef.docs.slice(0, 5).map((d) => ({
+    ...(d.data() as ICategoryDoc),
+    id: d.id,
+  }));
+
+  const total = await getCountFromServer(
+    query(categoriesRef, ...queriesKeyword)
+  );
+
   return { meta: { total: total.data().count }, data: categories };
-  };
-  
-  const getLastVisibleDoc = async (
+};
+
+const getLastVisibleDoc = async (
   queryRef: Query,
   page: number,
   size: number
-  ) => {
+) => {
   const docFormStart = await getDocs(query(queryRef, limit((page - 1) * size)));
   const lastDoc = docFormStart.docs[docFormStart.docs.length - 1];
   return lastDoc;
-  };
+};

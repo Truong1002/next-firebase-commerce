@@ -1,39 +1,36 @@
-'use client'
+"use client";
 import { ICreateCategoryInput } from "@/features/categories/type";
 import React from "react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import FormCategory from "../category-form";
-import { onAddCategory } from "./action";
-
-const CreateCategory = () => {
-  const router = useRouter();
+import FormCategory from "../../category-form";
+import { onEditCategory } from "./action";
+interface IProps {
+  data: ICreateCategoryInput;
+  id: string;
+}
+const EditFormCategory = ({ data, id }: IProps) => {
   const onSubmit = async ({
     name,
     description,
     slug,
   }: ICreateCategoryInput) => {
     try {
-      await onAddCategory({
+      await onEditCategory(id, {
         name,
         description,
         slug,
       });
-
       toast.info("Add category successfully !");
-      router.push("/admin/categories");
     } catch (error) {
       console.log("🚀 ~ CreateCategory ~ error:", error);
       toast.error("Cannot Add category!");
     }
   };
-
   return (
     <div>
       <h3 className="text-lg font-bold mb-8">Create category</h3>
-      <FormCategory onSubmit={onSubmit} />
+      <FormCategory onSubmit={onSubmit} data={data} />
     </div>
   );
 };
-
-export default CreateCategory;
+export default EditFormCategory;

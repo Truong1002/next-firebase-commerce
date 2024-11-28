@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ICategoryDb } from "@/features/categories/type";
 import { Pencil, Trash } from "lucide-react";
 import moment from "moment";
+import Link from "next/link";
 interface IProps{
     data: ICategoryDb[];
 }
@@ -31,7 +32,9 @@ const CategoryTable = ({ data }: IProps) => {
                         </TableCell>
                         <TableCell>
                             <div className="flex gap-1">
-                                <Pencil className="w-5 h-5"/>
+                                <Link href={"/admin/categories/edit/" + category.id}>
+                                    <Pencil className="w-5 h-5"/>
+                                </Link>
                                 <Trash className="w-5 h-5"/>
                             </div>
                         </TableCell>

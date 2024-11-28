@@ -1,5 +1,5 @@
 import { getCategories } from "@/features/categories/models";
-import TableHeader from "./table-header";
+import TableHeader from "../../../../components/common/table-header";
 import {
   Card,
   CardContent,
@@ -9,13 +9,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Suspense } from "react";
-import TableLoading from "./table-loading";
+import TableLoading from "../../../../components/common/table-loading";
 import CategoryTable from "./table";
-import TablePagination from "./table-pagination";
-import { IGetCategoryInput } from "@/features/categories/type";
+import TablePagination from "../../../../components/common/table-pagination";
+import { IGetDataInput } from "@/features/type";
 
 interface IProps {
-  searchParams: IGetCategoryInput;
+  searchParams: IGetDataInput;
 }
 const Category = async ({ searchParams }: IProps) => {
   const res = await getCategories({
@@ -26,7 +26,7 @@ const Category = async ({ searchParams }: IProps) => {
   });
   return (
     <div>
-      <TableHeader />
+      <TableHeader addTitle="Add Category" />
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader>
           <CardTitle>Categories</CardTitle>

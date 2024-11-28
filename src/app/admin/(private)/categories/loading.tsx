@@ -7,17 +7,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import TableHeader from "./table-header";
-import TablePagination from "./table-pagination";
-import TableLoading from "./table-loading";
+import TableHeader from "../../../../components/common/table-header";
+import TablePagination from "../../../../components/common/table-pagination";
+import TableLoading from "../../../../components/common/table-loading";
 const Category = async () => {
   return (
     <div>
-      <TableHeader />
+      <TableHeader addTitle="Add Category" />
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader>
           <CardTitle>Categories</CardTitle>
-          <CardDescription>Manage your Categories .</CardDescription>
+          <CardDescription>Manage your Categories</CardDescription>
         </CardHeader>
         <CardContent>
           <TableLoading />
@@ -26,7 +26,7 @@ const Category = async () => {
           <div className="text-xs text-muted-foreground">
             Showing <strong>1-10</strong> of <strong>32</strong> categories
           </div>
-          <TablePagination />
+          <TablePagination total={10}/>
         </CardFooter>
       </Card>
     </div>

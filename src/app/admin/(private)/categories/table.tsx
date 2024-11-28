@@ -25,7 +25,7 @@ const CategoryTable = ({ data }: IProps) => {
                     <TableHead>Slug</TableHead>
                     <TableHead>Creadted at</TableHead>
                     <TableHead>Edited at</TableHead>
-                    <TableHead className="w-28"></TableHead>
+                    <TableHead className="w-28">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

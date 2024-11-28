@@ -17,7 +17,9 @@ export const adminLogin = async (email:string, password: string) => {
     if(!isMatchPassword) {
         throw Error("The Password is incorrect");
     }
-
+    if (!existedAdmin.isActive) {
+        throw Error("This admin is inactive!");
+    }
     return {
         email: existedAdmin.email,
         id: existedAdmin.id

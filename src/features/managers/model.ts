@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { addDoc, collection, endAt, getCountFromServer, getDoc, getDocs, limit, orderBy, query, startAfter, startAt, Timestamp, where } from "firebase/firestore";
-import { IAdminDb, ICreateAdminInput } from "./type";
+import { addDoc, collection, doc, endAt, getCountFromServer, getDoc, getDocs, limit, orderBy, query, startAfter, startAt, Timestamp, updateDoc, where } from "firebase/firestore";
+import { IAdminDb, IAdminDoc, ICreateAdminInput } from "./type";
 import { COLLECTIONS } from "@/constants/common";
 import { db } from "@/utils/firebase";
 import { hashPassword } from "@/utils/common/password";
@@ -38,6 +38,7 @@ export const createAdmin = async (data: ICreateAdminInput) => {
     const newAdminRef = await addDoc(adminRef, {
         email: data.email,
         password: hashedPassword,
+        isActive: data.isActive,
         created_at: Timestamp.now(),
         updated_at: Timestamp.now()
     })
@@ -90,4 +91,14 @@ export const getManagers = async(
     );
 
     return { meta: { total: total.data().count }, data: managers };
+}
+
+export const updateActiveAdmin = async (id:string, isActive:boolean) => {
+    await updateDoc(doc(adminRef, id), {
+        isActive,
+    });
+
+    const newCategory = await getDoc(doc(adminRef, id));
+
+    return { id: newCategory.id, ...(newCategory.data() as IAdminDoc)}
 }

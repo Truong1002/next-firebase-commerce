@@ -52,7 +52,7 @@ const FormCategory = ({ data, onSubmit }: IProps) => {
             name="slug"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category name</FormLabel>
+                <FormLabel>Category slug</FormLabel>
                 <FormControl>
                   <Input placeholder="category description" {...field} />
                 </FormControl>

@@ -2,6 +2,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   endAt,
   getCountFromServer,
@@ -160,3 +161,7 @@ const getLastVisibleDoc = async (
   const lastDoc = docFormStart.docs[docFormStart.docs.length - 1];
   return lastDoc;
 };
+
+export const deleteCategoryById = (id: string) => {
+  return deleteDoc(doc(categoriesRef, id))
+}

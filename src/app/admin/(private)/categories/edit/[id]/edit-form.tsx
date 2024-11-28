@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { ICreateCategoryInput } from "@/features/categories/type";
 import React from "react";
@@ -20,10 +21,10 @@ const EditFormCategory = ({ data, id }: IProps) => {
         description,
         slug,
       });
-      toast.info("Add category successfully !");
-    } catch (error) {
-      console.log("🚀 ~ CreateCategory ~ error:", error);
-      toast.error("Cannot Add category!");
+      toast.info("Edit category successfully !");
+    } catch (error:any) {
+      const errorMessage = error?.message || "Cannot edit category!";
+      toast.error(errorMessage);
     }
   };
   return (

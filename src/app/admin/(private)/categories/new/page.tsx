@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { ICreateCategoryInput } from "@/features/categories/type";
 import React from "react";
@@ -22,9 +23,9 @@ const CreateCategory = () => {
 
       toast.info("Add category successfully !");
       router.push("/admin/categories");
-    } catch (error) {
-      console.log("🚀 ~ CreateCategory ~ error:", error);
-      toast.error("Cannot Add category!");
+    } catch (error:any) {
+      const errorMessage = error?.message || "Cannot Add category!";
+      toast.error(errorMessage);
     }
   };
 
